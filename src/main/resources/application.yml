@@ -27,12 +27,14 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
     consumer:
-      group-id: order
+      group-id: payment
+      enable-auto-commit: false
       auto-offset-reset: latest
-      enable-auto-commit: true
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-                  
+    listener:
+      ack-mode: manual-immediate
+                        
 eureka:
   instance:
     preferIpAddress: true

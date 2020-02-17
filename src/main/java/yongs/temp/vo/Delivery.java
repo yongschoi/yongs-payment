@@ -1,11 +1,30 @@
 package yongs.temp.vo;
 
+import org.springframework.data.annotation.Id;
+
 public class Delivery {
+	@Id
+	private String id;
 	private String no;
 	private String company;
 	private String address;
 	private String phone;
 	private long opentime;
+	private String orderNo;
+	private String type;
+	
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}	
+	public String getOrderNo() {
+		return orderNo;
+	}
+	public void setOrderNo(String orderNo) {
+		this.orderNo = orderNo;
+	}
 	public String getNo() {
 		return no;
 	}

@@ -1,8 +1,12 @@
 package yongs.temp.vo;
 
+import org.springframework.data.annotation.Id;
+
 import yongs.temp.model.Payment;
 
 public class Order{
+	@Id
+	private String id;
 	private String no; // ORD-currentTimeMillis();
 	private int qty;
 	private long opentime;
@@ -10,7 +14,14 @@ public class Order{
 	private User user;
 	private Payment payment;
 	private Delivery delivery;
+	private int status;
 	
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+	}
 	public String getNo() {
 		return no;
 	}

@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import yongs.temp.dao.PaymentRepository;
@@ -22,7 +22,6 @@ public class PaymentService {
 	
 	// for listener
 	private static final String STOCK_PAYMENT_EVT = "stock-to-payment";
-	private static final String ROLLBACK_EVT = "delivery-rollback";
 	
 	@Autowired
     KafkaTemplate<String, String> kafkaTemplate;
@@ -31,36 +30,46 @@ public class PaymentService {
     PaymentRepository repo;
 
 	@KafkaListener(topics = STOCK_PAYMENT_EVT)
-	public void create(String orderStr) throws JsonProcessingException {
+	public void create(String orderStr, Acknowledgment ack) {
 		ObjectMapper mapper = new ObjectMapper();
-		Order order = mapper.readValue(orderStr, Order.class);
-		
-		long curr = System.currentTimeMillis();
-		String no = "PAY" + curr;
-		order.getPayment().setNo(no);
-		order.getPayment().setOpentime(curr);
-		order.getPayment().setOrderNo(order.getNo());
-		
+	
 		try {
+			Order order = mapper.readValue(orderStr, Order.class);
+			
+			long curr = System.currentTimeMillis();
+			String no = "PAY" + curr;
+			order.getPayment().setNo(no);
+			order.getPayment().setOpentime(curr);
+			order.getPayment().setOrderNo(order.getNo());
+			
 			// 결제 API call
+			// ...
+			// ...
 			repo.insert(order.getPayment());
 			String newOrderStr = mapper.writeValueAsString(order);
-			logger.info(">>>>> 결제 성공  >>>>>> " + order.getNo());
 			kafkaTemplate.send(PAYMENT_DELIVERY_EVT, newOrderStr);
+			logger.debug("[PAYMENT to DELIVERY(결제성공)] Order No [" + order.getNo() + "]");
 		} catch (Exception e) {
-			logger.info(">>>>> 결제 실패  >>>>>> " + order.getNo());
-			kafkaTemplate.send(PAYMENT_ROLLBACK_EVT, orderStr);			
+			kafkaTemplate.send(PAYMENT_ROLLBACK_EVT, orderStr);
+			logger.debug("[PAYMENT Exception(결제 실패)]");
 		}
+		// 성공하든 실패하든
+		ack.acknowledge();
 	}
 	
-	@KafkaListener(topics = ROLLBACK_EVT)
-	public void rollback(String orderStr) throws JsonProcessingException {
+	@KafkaListener(topics = {"delivery-rollback"})
+	public void rollback(String orderStr, Acknowledgment ack) {
 		ObjectMapper mapper = new ObjectMapper();
-		Order order = mapper.readValue(orderStr, Order.class);
-		
-		// Payment 데이터 삭제 
-		repo.deleteByOrderNo(order.getNo()); 
-		logger.info("Payment No [" + order.getPayment().getNo() + "] Rollback !!!");
+		try {
+			Order order = mapper.readValue(orderStr, Order.class);
+			
+			// Payment 데이터 삭제 
+			repo.deleteByOrderNo(order.getNo()); 		
+			// 성공할때 까지
+			ack.acknowledge();
+			logger.debug("[PAYMENT Rollback] Order No [" + order.getNo() + "]");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-
 }
