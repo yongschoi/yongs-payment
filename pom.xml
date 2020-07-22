@@ -19,7 +19,18 @@
 		<spring-cloud.version>Hoxton.RELEASE</spring-cloud.version>
 	</properties>
 
-	<dependencies>			
+	<dependencies>	
+		<!-- Sleuth 설정 -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-sleuth</artifactId>
+		</dependency>
+		<!-- Zipkin -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-zipkin</artifactId>
+		</dependency>
+				
 		<!-- Web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

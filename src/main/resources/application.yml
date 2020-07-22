@@ -18,6 +18,11 @@ spring:
   profiles: window-dev
   application:
     name: yongs-payment  
+  sleuth:
+    sampler:
+      probability: 1
+  zipkin:
+    baseUrl: http://localhost:9411/
   data:
     mongodb:
       uri: mongodb://127.0.0.1:27017/flex
@@ -34,7 +39,7 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     listener:
       ack-mode: manual-immediate
-                        
+                            
 eureka:
   instance:
     preferIpAddress: true
