@@ -1,11 +1,18 @@
 package yongs.temp.vo;
 
 public class Product {
+	private String id;
 	private String code;
 	private String name;
 	private String image;
 	private String price;
-	
+ 
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
 	public String getCode() {
 		return code;
 	}

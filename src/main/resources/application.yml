@@ -25,7 +25,7 @@ spring:
     baseUrl: http://localhost:9411/
   data:
     mongodb:
-      uri: mongodb://127.0.0.1:27017/flex
+      uri: mongodb://127.0.0.1:27027/order
   kafka:
     bootstrap-servers: localhost:9092
     producer:
@@ -44,6 +44,7 @@ eureka:
   instance:
     preferIpAddress: true
     hostname: localhost
+    instanceId: ${spring.application.name}:${random.value}
   client:
     enabled: true
     serviceUrl:
