@@ -49,3 +49,53 @@ eureka:
     enabled: true
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+
+---
+server:
+  port: 8080
+
+logging:
+  level:
+    yongs:
+      temp: INFO
+    com:
+      netflix:
+        eureka: OFF
+        discovery: OFF  
+      
+spring:
+  profiles: container
+  application:
+    name: yongs-payment  
+  sleuth:
+    sampler:
+      probability: 1
+  zipkin:
+    baseUrl: http://zipkin:9411/
+  data:
+    mongodb:
+      uri: mongodb://order-mongo:27027/order
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: payment
+      enable-auto-commit: false
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: manual-immediate
+                            
+eureka:
+  instance:
+    preferIpAddress: true
+    hostname: eureka
+    instanceId: ${spring.application.name}:${random.value}
+  client:
+    enabled: true
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+      
